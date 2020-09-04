@@ -6,17 +6,17 @@ import {
   InfoWindow
 } from '@react-google-maps/api';
 import { formatRelative } from 'date-fns';
-// import {
-//   getGeocode,
-//   getLatLng,
-// } from 'use-places-autocomplete';
-// import {
-//   Combobox,
-//   ComboboxInput,
-//   ComboboxPopover,
-//   ComboboxList,
-//   ComboboxOption
-// } from '@reach/combobox';
+import usePlacesAutocomplete, {
+  getGeocode,
+  getLatLng
+} from 'use-places-autocomplete';
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxPopover,
+  ComboboxList,
+  ComboboxOption
+} from '@reach/combobox';
 import '@reach/combobox/styles.css';
 
 import mapStyles from './mapStyles';
@@ -36,7 +36,7 @@ const options = {
   zoomControl: true
 };
 
-function App() {
+export default function App() {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries
@@ -71,6 +71,9 @@ function App() {
           ⛺️
         </span>
       </h1>
+
+      <Search />
+
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={8}
@@ -113,4 +116,39 @@ function App() {
   );
 }
 
-export default App;
+function Search() {
+  const {
+    ready,
+    value,
+    suggestions: { status, data },
+    setValue,
+    clearSuggestions
+  } = usePlacesAutocomplete({
+    requestOptions: {
+      location: {
+        lat: () => -1.292066,
+        lng: () => 36.821945
+      },
+      radius: 200 * 1000
+    }
+  });
+
+  return (
+    <div className="search">
+      <Combobox
+        onSelect={address => {
+          console.log(address);
+        }}
+      >
+        <ComboboxInput
+          value={value}
+          onChange={e => {
+            setValue(e.target.value);
+          }}
+          disabled={!ready}
+          placeholder="Enter an address"
+        />
+      </Combobox>
+    </div>
+  );
+}
