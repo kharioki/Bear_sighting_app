@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   GoogleMap,
   useLoadScript,
@@ -55,6 +55,11 @@ function App() {
     ]);
   }, []);
 
+  const mapRef = useRef();
+  const onMapLoad = useCallback(map => {
+    mapRef.current = map;
+  }, []);
+
   if (loadError) return 'Error loading maps';
   if (!isLoaded) return 'Loading maps...';
   return (
@@ -71,6 +76,7 @@ function App() {
         center={center}
         options={options}
         onClick={onMapClick}
+        onLoad={onMapLoad}
       >
         {markers.map(marker => (
           <Marker
