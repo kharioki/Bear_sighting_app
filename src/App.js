@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   GoogleMap,
   useLoadScript,
@@ -44,6 +44,17 @@ function App() {
 
   const [markers, setMarkers] = useState([]);
 
+  const onMapClick = useCallback(event => {
+    setMarkers(prev => [
+      ...prev,
+      {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng(),
+        time: new Date()
+      }
+    ]);
+  }, []);
+
   if (loadError) return 'Error loading maps';
   if (!isLoaded) return 'Loading maps...';
   return (
@@ -59,16 +70,7 @@ function App() {
         zoom={8}
         center={center}
         options={options}
-        onClick={event => {
-          setMarkers(prev => [
-            ...prev,
-            {
-              lat: event.latLng.lat(),
-              lng: event.latLng.lng(),
-              time: new Date()
-            }
-          ]);
-        }}
+        onClick={onMapClick}
       >
         {markers.map(marker => (
           <Marker
