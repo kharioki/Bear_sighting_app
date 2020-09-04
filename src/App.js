@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   GoogleMap,
   useLoadScript,
@@ -42,16 +42,41 @@ function App() {
     libraries
   });
 
+  const [markers, setMarkers] = useState([]);
+
   if (loadError) return 'Error loading maps';
   if (!isLoaded) return 'Loading maps...';
   return (
     <div>
+      <h1>
+        Bears{' '}
+        <span role="img" aria-label="tent">
+          ⛺️
+        </span>
+      </h1>
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={8}
         center={center}
         options={options}
-      ></GoogleMap>
+        onClick={event => {
+          setMarkers(prev => [
+            ...prev,
+            {
+              lat: event.latLng.lat(),
+              lng: event.latLng.lng(),
+              time: new Date()
+            }
+          ]);
+        }}
+      >
+        {markers.map(marker => (
+          <Marker
+            key={marker.time.toISOString()}
+            position={{ lat: marker.lat, lng: marker.lng }}
+          />
+        ))}
+      </GoogleMap>
     </div>
   );
 }
