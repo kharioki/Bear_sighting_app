@@ -43,6 +43,7 @@ function App() {
   });
 
   const [markers, setMarkers] = useState([]);
+  const [selected, setSelected] = useState(null);
 
   const onMapClick = useCallback(event => {
     setMarkers(prev => [
@@ -88,8 +89,25 @@ function App() {
               origin: new window.google.maps.Point(0, 0),
               anchor: new window.google.maps.Point(15, 15)
             }}
+            onClick={() => {
+              setSelected(marker);
+            }}
           />
         ))}
+
+        {selected ? (
+          <InfoWindow
+            position={{ lat: selected.lat, lng: selected.lng }}
+            onCloseClick={() => {
+              setSelected(null);
+            }}
+          >
+            <div>
+              <h2>Bear spotted</h2>
+              <p>Spotted {formatRelative(selected.time, new Date())}</p>
+            </div>
+          </InfoWindow>
+        ) : null}
       </GoogleMap>
     </div>
   );
