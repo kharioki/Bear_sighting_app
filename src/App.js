@@ -71,7 +71,7 @@ export default function App() {
   return (
     <div>
       <h1>
-        Bears{' '}
+        Bears-sighting{' '}
         <span role="img" aria-label="tent">
           ⛺️
         </span>
