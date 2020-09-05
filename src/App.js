@@ -61,6 +61,11 @@ export default function App() {
     mapRef.current = map;
   }, []);
 
+  const panTo = useCallback(({ lat, lng }) => {
+    mapRef.current.panTo({ lat, lng });
+    mapRef.current.setZoom(14);
+  }, []);
+
   if (loadError) return 'Error loading maps';
   if (!isLoaded) return 'Loading maps...';
   return (
@@ -72,7 +77,7 @@ export default function App() {
         </span>
       </h1>
 
-      <Search />
+      <Search panTo={panTo} />
 
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
@@ -116,7 +121,7 @@ export default function App() {
   );
 }
 
-function Search() {
+function Search({ panTo }) {
   const {
     ready,
     value,
@@ -133,13 +138,22 @@ function Search() {
     }
   });
 
+  const handleSelect = async address => {
+    setValue(address);
+    clearSuggestions();
+
+    try {
+      const results = await getGeocode({ address });
+      const { lat, lng } = await getLatLng(results[0]);
+      panTo({ lat, lng });
+    } catch (error) {
+      console.log('😱 Error: ', error);
+    }
+  };
+
   return (
     <div className="search">
-      <Combobox
-        onSelect={address => {
-          console.log(address);
-        }}
-      >
+      <Combobox onSelect={handleSelect}>
         <ComboboxInput
           value={value}
           onChange={e => {
@@ -148,6 +162,12 @@ function Search() {
           disabled={!ready}
           placeholder="Enter an address"
         />
+        <ComboboxPopover>
+          {status === 'OK' &&
+            data.map(({ id, description }) => (
+              <ComboboxOption key={id} value={description} />
+            ))}
+        </ComboboxPopover>
       </Combobox>
     </div>
   );
